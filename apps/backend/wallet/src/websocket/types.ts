@@ -1,6 +1,6 @@
 /**
- * WebSocket Transaction Status Updates — shared types
- * Issue #41
+ * WebSocket Transaction Status & Balance Updates — shared types
+ * Issues #41, #108
  */
 
 export type TxEventType = "submitted" | "confirmed" | "failed";
@@ -14,6 +14,18 @@ export interface TransactionStatusEvent {
   /** ISO 8601 */
   timestamp: string;
   errorMessage: string | null;
+}
+
+/** Real-time balance update pushed when an account's holdings change. */
+export interface AssetBalanceEvent {
+  type: "balances_updated";
+  address: string;
+  /** assetKey -> balance (stroops) after the change. */
+  balances: Record<string, string>;
+  /** Canonical asset keys that changed since the last snapshot. */
+  changedAssets: string[];
+  /** ISO 8601 */
+  timestamp: string;
 }
 
 export type WSAction = "subscribe" | "unsubscribe";
@@ -32,5 +44,5 @@ export interface WSError {
 
 export interface WSMessage {
   type: "event" | "error" | "ack" | "pong";
-  data: TransactionStatusEvent | WSError | { message: string } | null;
+  data: TransactionStatusEvent | AssetBalanceEvent | WSError | { message: string } | null;
 }

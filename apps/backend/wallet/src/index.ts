@@ -34,6 +34,7 @@ import { closeQueue } from "./queue/txQueue.js";
 import { initSimulationCache } from "./simulationCache.js";
 import { initDLQ } from "./queue/transactionDLQ.js";
 import { getRedisConnection } from "./queue/txQueue.js";
+import { balanceTracker } from "./assets/balances.js";
 
 const server = startHttpServer({
   port,
@@ -89,6 +90,14 @@ async function gracefulShutdown(signal: NodeJS.Signals): Promise<void> {
     log.info("Batch flush timers stopped");
   } catch (err) {
     log.error("Error stopping batch flush timers", { error: (err as Error).message });
+  }
+
+  // Stop real-time balance trackers
+  try {
+    balanceTracker.stopAll();
+    log.info("Balance trackers stopped");
+  } catch (err) {
+    log.error("Error stopping balance trackers", { error: (err as Error).message });
   }
 
   // Close WebSocket server

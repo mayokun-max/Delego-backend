@@ -38,6 +38,7 @@ docs/
 │   ├── contracts.md             # Smart contract architecture
 │   └── wallet.md                # Wallet architecture
 ├── contributor-guide.md         # Guide for contributors
+├── assets-management.md         # Asset management module (Issue #108)
 ├── api-reference.md             # API reference documentation
 └── grant-deliverables.md        # Grant milestone tracking
 ```
@@ -121,6 +122,14 @@ The architecture directory contains detailed technical documentation:
 - Key management
 - Stellar integration
 - Soroban permissions
+
+### Asset Management ([assets-management.md](./assets-management.md))
+
+- Balance & portfolio loading
+- Trustline and transfer operations
+- Asset discovery and SAC tokens
+- Spam filtering
+- Real-time WebSocket updates
 
 ## Contributor Documentation
 

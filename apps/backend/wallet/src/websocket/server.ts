@@ -19,7 +19,11 @@ import * as crypto from "node:crypto";
 import * as net from "node:net";
 import { createLogger } from "@delegolabs/utils";
 import { verifyJwt } from "./auth.js";
-import type { TransactionStatusEvent, WSMessage } from "./types.js";
+import type {
+  TransactionStatusEvent,
+  AssetBalanceEvent,
+  WSMessage,
+} from "./types.js";
 
 const log = createLogger("wallet:websocket", process.env.LOG_LEVEL ?? "info");
 
@@ -237,6 +241,36 @@ export function broadcastTransactionEvent(
 
 export function getSubscriberCount(address: string): number {
   return subscriptions.get(address)?.size ?? 0;
+}
+
+/**
+ * Broadcasts an AssetBalanceEvent to all connections subscribed to `address`.
+ * Called by the BalanceTracker whenever a balance changes.
+ */
+export function broadcastBalanceEvent(
+  address: string,
+  event: AssetBalanceEvent,
+): void {
+  const subs = subscriptions.get(address);
+  if (!subs || subs.size === 0) return;
+
+  const msg: WSMessage = { type: "event", data: event };
+  let sent = 0;
+
+  for (const connId of subs) {
+    const conn = connections.get(connId);
+    if (conn) {
+      sendMessage(conn.socket, msg);
+      sent++;
+    }
+  }
+
+  log.debug("Broadcast balance event", {
+    address,
+    eventType: event.type,
+    changedAssets: event.changedAssets.length,
+    sent,
+  });
 }
 
 export function getTotalConnectionCount(): number {
