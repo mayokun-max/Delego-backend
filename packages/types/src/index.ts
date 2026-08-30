@@ -3,6 +3,7 @@
  * All services and apps should import from this package.
  */
 
+export * from "./assets.js";
 export * from "./user.js";
 export * from "./delegation.js";
 export * from "./escrow.js";

@@ -22,6 +22,8 @@ export interface TransactionRequest {
   contractId: string;
   method: string;
   args: unknown[];
+  /** Optional ScVal type hints for each arg (e.g. "address", "i128", "u64"). */
+  argTypes?: string[];
   /** Human-readable description for approval UI */
   memo: string;
   userId?: string;

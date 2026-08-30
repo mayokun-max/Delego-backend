@@ -30,6 +30,7 @@ import { registerBatchingRoutes } from "./batching/routes.js";
 import { registerSequenceAdminRoutes } from "./batching/sequenceAdminRoutes.js";
 import { registerSimulationCacheAdminRoutes } from "./batching/simulationCacheAdminRoutes.js";
 import { registerDLQAdminRoutes } from "./batching/dlqAdminRoutes.js";
+import { registerAssetRoutes } from "./assets/routes.js";
 
 const log = createLogger("wallet:routes", process.env.LOG_LEVEL ?? "info");
 
@@ -770,5 +771,8 @@ export function registerRoutes(): Route[] {
 
     // --- Issue #143: Transaction DLQ admin routes ---
     ...registerDLQAdminRoutes(),
+
+    // --- Issue #108: Asset management routes ---
+    ...registerAssetRoutes(),
   ];
 }

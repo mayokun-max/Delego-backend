@@ -140,12 +140,22 @@ function getStellarConfig() {
 
 const STELLAR_STRKEY_RE = /^[GC][A-Z2-7]{55}$/;
 
-function argToScVal(arg: unknown): ReturnType<typeof nativeToScVal> {
+function argToScVal(arg: unknown, typeHint?: string): ReturnType<typeof nativeToScVal> {
   if (typeof arg === "string" && STELLAR_STRKEY_RE.test(arg)) {
     try {
-      return Address.fromString(arg).toScVal();
+      if (typeHint === "address") {
+        return Address.fromString(arg).toScVal();
+      }
+      // Fall back to default encoding when strkey checksum is invalid.
     } catch {
       // Fall back to default encoding when strkey checksum is invalid.
+    }
+  }
+  if (typeHint) {
+    try {
+      return nativeToScVal(arg, { type: typeHint as never });
+    } catch {
+      // fall back to untyped conversion when the hint is not applicable
     }
   }
   return nativeToScVal(arg);
@@ -163,7 +173,9 @@ export const transactionService: TransactionService = {
     try {
       const sourceAccount = await horizonServer.loadAccount(request.sourceAddress);
       
-      const scArgs = request.args.map((arg) => argToScVal(arg));
+      const scArgs = request.args.map((arg, index) =>
+        argToScVal(arg, request.argTypes?.[index]),
+      );
       
       const tx = new TransactionBuilder(sourceAccount, {
         fee: await getTransactionFee(horizonUrl),
